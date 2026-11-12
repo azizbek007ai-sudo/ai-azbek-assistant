@@ -2,11 +2,11 @@ import os
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from google import genai
+import google.generativeai as genai
 
 app = FastAPI()
 
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 class Message(BaseModel):
     text: str
@@ -82,23 +82,14 @@ def home():
 def chat_with_ai(msg: Message):
     sys_inst = "Сенинг исминг AI Azizbek. Сен Азизбекнинг шахсий сунъий интеллект ёрдамчисисан. Кимлигинг ёки исмингни сўрашса, ўзингни доим AI Azizbek деб таништир. Ҳеч қачон ўзингни Gemini деб атама."
     
-    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
-    ai_response = None
-
-    for model_name in models_to_try:
-        try:
-            response = client.models.generate_content(
-                model=model_name,
-                contents=msg.text,
-                config={"system_instruction": sys_inst}
-            )
-            ai_response = response.text
-            if ai_response:
-                break
-        except Exception as e:
-            continue
-
-    if not ai_response:
-        ai_response = "Salom! Hozirda tarmoqda yuklama bor, lekin men AI Azizbekman va sizga yordam berishga tayyorman!"
+    try:
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            system_instruction=sys_inst
+        )
+        response = model.generate_content(msg.text)
+        ai_response = response.text
+    except Exception as e:
+        ai_response = "Salom! Men AI Azizbekman. Hozir tarmoqda yuklama bor, lekin sizga yordam berishga tayyorman!"
     
     return {"response": ai_response}
