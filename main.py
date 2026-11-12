@@ -8,7 +8,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 app = FastAPI()
 
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-chat_history = []
 
 class Message(BaseModel):
     text: str
@@ -88,30 +87,26 @@ def home():
 
 @app.post("/chat")
 def chat_with_ai(msg: Message):
-    chat_history.append(f"Фойдаланувчи: {msg.text}")
-    prompt = "\n".join(chat_history)
-    
     sys_inst = "Сенинг исминг AI Azizbek. Сен Азизбекнинг шахсий сунъий интеллект ёрдамчисисан. Кимлигинг ёки исмингни сўрашса, ўзингни доим AI Azizbek деб таништир. Ҳеч қачон ўзингни Gemini деб атама."
     
-    models_to_try = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    # Eng barqaror ishlaydigan modellar ketма-кетлиги
+    models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     ai_response = None
-    last_error = ""
 
     for model_name in models_to_try:
         try:
             response = client.models.generate_content(
                 model=model_name,
-                contents=prompt,
+                contents=msg.text,
                 config={"system_instruction": sys_inst}
             )
             ai_response = response.text
-            break
+            if ai_response:
+                break
         except Exception as e:
-            last_error = str(e)
             continue
 
     if not ai_response:
-        return {"response": f"Сервер банд, бироздан сўнг уриниб кўринг. ({last_error[:60]})"}
+        ai_response = "Ayni paytda server band. Iltimos, bir ozdan keyin qayta urinib ko'ring."
     
-    chat_history.append(f"Агент: {ai_response}")
     return {"response": ai_response}
