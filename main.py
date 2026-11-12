@@ -27,7 +27,7 @@ def chat_with_ai(msg: Message):
     chat_history.append(f"Фойдаланувчи: {msg.text}")
     prompt = "\n".join(chat_history)
     
-        response = client.models.generate_content(
+   response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=prompt,
         config={
