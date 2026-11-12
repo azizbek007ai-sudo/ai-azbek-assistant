@@ -14,13 +14,13 @@ class Message(BaseModel):
 
 scheduler = BackgroundScheduler()
 def scheduled_job():
-    print("Режалаштирилган вазифа бажарилди.")
+    print("Background job executed.")
 scheduler.add_job(scheduled_job, 'interval', minutes=30)
 scheduler.start()
 
 @app.get("/")
 def home():
-    return {"status": "AI Azbek assistant is running successfully!"}
+    return {"status": "AI Azbek is online!"}
 
 @app.post("/chat")
 def chat_with_ai(msg: Message):
@@ -34,5 +34,4 @@ def chat_with_ai(msg: Message):
     
     ai_response = response.text
     chat_history.append(f"Агент: {ai_response}")
-    
     return {"response": ai_response}
