@@ -27,10 +27,10 @@ html_content = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Azizbek</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        .header { background: #1a73e8; color: white; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #1a73e8; color: white; padding: 15px; text-align: center; font-size: 18px; font-weight: bold; }
         #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; line-height: 1.4; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; line-height: 1.4; word-wrap: break-word; }
         .user { background: #1a73e8; color: white; align-self: flex-end; }
         .ai { background: white; color: #333; align-self: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .input-area { display: flex; padding: 10px; background: white; border-top: 1px solid #ddd; }
@@ -44,7 +44,7 @@ html_content = """
         <div class="msg ai">Assalomu alaykum! Men AI Azizbekman. Sizga qanday yordam bera olaman?</div>
     </div>
     <div class="input-area">
-        <input type="text" id="msg-input" placeholder="Xabar yozing..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <input type="text" id="msg-input" placeholder="Xabar yozing..." autocomplete="off">
         <button onclick="sendMsg()">Yuborish</button>
     </div>
     <script>
@@ -58,15 +58,25 @@ html_content = """
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({text: text})
-            });
-            const data = await response.json();
-            chatBox.innerHTML += `<div class="msg ai">${data.response}</div>`;
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: text})
+                });
+                const data = await response.json();
+                chatBox.innerHTML += `<div class="msg ai">${data.response}</div>`;
+            } catch (error) {
+                chatBox.innerHTML += `<div class="msg ai">Xatolik yuz berdi!</div>`;
+            }
             chatBox.scrollTop = chatBox.scrollHeight;
         }
+
+        document.getElementById('msg-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMsg();
+            }
+        });
     </script>
 </body>
 </html>
