@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from google import genai
-from apscheduler.schedulers.background import BackgroundScheduler
 
 app = FastAPI()
 
@@ -11,12 +10,6 @@ client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 class Message(BaseModel):
     text: str
-
-scheduler = BackgroundScheduler()
-def scheduled_job():
-    print("Background job executed.")
-scheduler.add_job(scheduled_job, 'interval', minutes=30)
-scheduler.start()
 
 html_content = """
 <!DOCTYPE html>
@@ -89,7 +82,6 @@ def home():
 def chat_with_ai(msg: Message):
     sys_inst = "Сенинг исминг AI Azizbek. Сен Азизбекнинг шахсий сунъий интеллект ёрдамчисисан. Кимлигинг ёки исмингни сўрашса, ўзингни доим AI Azizbek деб таништир. Ҳеч қачон ўзингни Gemini деб атама."
     
-    # Eng barqaror ishlaydigan modellar ketма-кетлиги
     models_to_try = ["gemini-2.5-flash", "gemini-1.5-flash"]
     ai_response = None
 
@@ -107,6 +99,6 @@ def chat_with_ai(msg: Message):
             continue
 
     if not ai_response:
-        ai_response = "Ayni paytda server band. Iltimos, bir ozdan keyin qayta urinib ko'ring."
+        ai_response = "Salom! Hozirda tarmoqda yuklama bor, lekin men AI Azizbekman va sizga yordam berishga tayyorman!"
     
     return {"response": ai_response}
