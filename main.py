@@ -91,14 +91,27 @@ def chat_with_ai(msg: Message):
     chat_history.append(f"Фойдаланувчи: {msg.text}")
     prompt = "\n".join(chat_history)
     
-    response = client.models.generate_content(
-        model="gemini-3.8-flash",
-        contents=prompt,
-        config={
-            "system_instruction": "Сенинг исминг AI Azizbek. Сен Азизбекнинг шахсий сунъий интеллект ёрдамчисисан. Кимлигинг ёки исмингни сўрашса, ўзингни доим AI Azizbek деб таништир. Ҳеч қачон ўзингни Gemini деб атама."
-        }
-    )
+    sys_inst = "Сенинг исминг AI Azizbek. Сен Азизбекнинг шахсий сунъий интеллект ёрдамчисисан. Кимлигинг ёки исмингни сўрашса, ўзингни доим AI Azizbek деб таништир. Ҳеч қачон ўзингни Gemini деб атама."
     
-    ai_response = response.text
+    models_to_try = ["gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    ai_response = None
+    last_error = ""
+
+    for model_name in models_to_try:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config={"system_instruction": sys_inst}
+            )
+            ai_response = response.text
+            break
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    if not ai_response:
+        return {"response": f"Сервер банд, бироздан сўнг уриниб кўринг. ({last_error[:60]})"}
+    
     chat_history.append(f"Агент: {ai_response}")
     return {"response": ai_response}
