@@ -20,7 +20,7 @@ scheduler.start()
 
 @app.get("/")
 def home():
-    return {"status": "AI Azbek is online!"}
+    return {"status": "AI Azizbek is online!"}
 
 @app.post("/chat")
 def chat_with_ai(msg: Message):
